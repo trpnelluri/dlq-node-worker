@@ -1,0 +1,45 @@
+{
+  "name": "dlqprocessworker",
+  "version": "1.0.0",
+  "description": "This project is used to process the dlq messages for all workers",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js dev",
+    "stg": "nodemon app.js stg",
+    "prod": "nodemon app.js prod"
+  },
+  "author": "Siva Nelluri",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^3.2.0",
+    "aws-param-env": "^2.1.0",
+    "aws-sdk": "^2.931.0",
+    "body-parser": "^1.19.0",
+    "date-and-time": "^2.0.0",
+    "dotenv": "^10.0.0",
+    "ejs": "^3.1.6",
+    "events": "^3.3.0",
+    "express": "^4.17.1",
+    "https": "^1.0.0",
+    "jest": "^27.0.4",
+    "jest-extended": "^1.0.0",
+    "jest-fetch-mock": "^3.0.3",
+    "jest-junit": "^13.0.0",
+    "moment": "^2.29.1",
+    "node-cache": "^5.1.2",
+    "nodemon": "^2.0.7",
+    "replay-aws-dlq": "^1.0.1",
+    "shelljs": "^0.8.5",
+    "sqs-consumer": "^5.5.0",
+    "uuid": "^8.3.2",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.5"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.24.1"
+  }
+}
