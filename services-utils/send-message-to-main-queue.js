@@ -4,7 +4,6 @@ const AWS = require('aws-sdk')
 const IdServiceShared = require('../sharedLib/common/id-service')
 
 AWS.config.update({ region: 'us-east-1' })
-// Create the SQS service object
 let sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
 
 let targetQueueQRL = process.env.main_hih_notifications_queue

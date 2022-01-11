@@ -5,9 +5,7 @@ const controller = require('../controllers/controller');
 
 const router = express.Router();
 
-router.get('/', controller.hello);
-
-
+router.get('/', controller.default);
 router.get('/esmd-dlk-audit-queue', controller.processAuditDLQ);
 router.get('/esmd-dlk-email-queue', controller.processEmailDLQ);
 router.get('/esmd-dlk-epor-status', controller.processEporStatusDLQ);

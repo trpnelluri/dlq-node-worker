@@ -10,6 +10,7 @@ const sendMsgToMainQueue = require('../services-utils/send-message-to-main-queue
 const sourceQueueURL = process.env.dlq_hih_notifications_queue
 //const visibilityTimeout = process.env.visibilitytimeout
 //const hihNotifyReprocessTimeInMins = process.env.hihnotificationreprocesstime
+const maxNumberOfMessages = process.env.messagesbatchsize
 const visibilityTimeout = 120
 const hihNotifyReprocessTimeInMins = 3
 
@@ -19,10 +20,10 @@ async function receiveMsgFromDLQ () {
     
     let params = {
         AttributeNames: ['All'],
-        MaxNumberOfMessages: 10,
+        MaxNumberOfMessages: maxNumberOfMessages,
         MessageAttributeNames: ['All'],
-        QueueUrl: sourceQueueURL, //DLQ1
-        VisibilityTimeout:visibilityTimeout
+        QueueUrl: sourceQueueURL //DLQ1
+        //VisibilityTimeout:visibilityTimeout
     }
 
     const { Messages } = await sqs.receiveMessage(params).promise();
@@ -51,7 +52,7 @@ async function receiveMsgFromDLQ () {
     } else {
         console.log('mesages not available to process')
     }
-        
+     
 }
 
 module.exports = {
