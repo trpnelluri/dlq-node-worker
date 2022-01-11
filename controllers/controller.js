@@ -1,6 +1,7 @@
 'use strict'
 
 const processDLQ = require('../services/dlq-execute-command')
+const processReceiveMessage = require('../services-utils/receive-and-process-dlq-messages')
 
 exports.hello = (req, res) => {
     res.send('Welcome to Unissant');
@@ -62,3 +63,12 @@ exports.processHIHNotificationsDLQ = (req, res) => {
     processDLQ.executeDLQCommand(res, sourceQueue, targetQueue)
 };
 
+
+exports.processHIHNotificationsDLQ1 = (req, res) => {
+    console.log(`processHIHNotificationsDLQ req.headers: ${JSON.stringify(req.headers)}`)
+    let sourceQueue = process.env.dlq_hih_notifications_queue
+    let targetQueue = process.env.main_hih_notifications_queue
+    console.log(`processHIHNotificationsDLQ1 sourceQueue: ${sourceQueue} targetQueue: ${targetQueue}`)
+    //processDLQ.executeDLQCommand(res, sourceQueue, targetQueue)
+    processReceiveMessage.receiveMsgFromDLQ();
+};

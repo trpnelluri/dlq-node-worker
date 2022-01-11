@@ -1,6 +1,7 @@
 'use strict'
 
 const AWS = require('aws-sdk')
+//const moment = require('moment');
 
 AWS.config.update({ region: 'us-east-1' })
 // Create the SQS service object
@@ -8,21 +9,59 @@ let sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
 
 let sourceQueueURL = process.env.dlq_hih_notifications_queue
 let targetQueueQRL = process.env.main_hih_notifications_queue
-const visibilityTimeout = process.env.visibilitytimeout
-const hihNotifyReprocessTimeInMins = process.env.hihnotificationreprocesstime
+//const visibilityTimeout = process.env.visibilitytimeout
+//const hihNotifyReprocessTimeInMins = process.env.hihnotificationreprocesstime
+const visibilityTimeout = 90
+const hihNotifyReprocessTimeInMins = 3
 
 console.log(`sourceQueueURL: ${sourceQueueURL} targetQueueQRL ${targetQueueQRL} visibilityTimeout: ${visibilityTimeout} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins}`)
 
-function receivemsg () {
+async function receiveMsgFromDLQ () {
     
     let params = {
         AttributeNames: ['All'],
-        MaxNumberOfMessages: 1,
+        MaxNumberOfMessages: 10,
         MessageAttributeNames: ['All'],
         QueueUrl: sourceQueueURL, //DLQ1
         VisibilityTimeout:visibilityTimeout
     }
 
+    const { Messages } = await sqs.receiveMessage(params).promise();
+
+    if ( Messages.length > 0 ) {
+        console.log(`Messages.length: ${Messages.length}`)
+
+        Messages.forEach((message) => {
+            console.log(`message: ${JSON.stringify(message)}`)
+            console.log(`message.Attributes.ApproximateFirstReceiveTimestamp: ${message.Attributes.ApproximateFirstReceiveTimestamp}`)
+            let stringtoEpocDate = message.Attributes.ApproximateFirstReceiveTimestamp
+        
+            let myDate = new Date( stringtoEpocDate * 1 * 1000);
+            console.log(`myDate.toLocaleString(): ${myDate.toLocaleString()}`);
+            
+            let date = new Date();
+            let timestamp = Math.floor(date.getTime());
+            console.log(`timestamp: ${timestamp}`)
+
+            let currentTime = new Date();
+	        let getCurrentTimeInMilliSecs = currentTime.getTime();
+            console.log(`getCurrentTimeInMilliSecs: ${getCurrentTimeInMilliSecs}`)
+            
+            let differenceinTime = getCurrentTimeInMilliSecs - stringtoEpocDate
+
+            console.log(`differenceinTime: ${differenceinTime}`)
+
+            let min = differenceinTime / 60000
+
+            console.log(`min: ${min}`)
+
+            if ( min > 110 ) {
+                console.log(`min is greater than 110: ${min}`)
+            }
+        })
+    }
+
+    /*
     sqs.receiveMessage(params, function (err, data) {
         if (err) {
             console.log('Receive Error', err)
@@ -78,9 +117,10 @@ function receivemsg () {
             }
         }
     })
+    */
     
 }
 
 module.exports = {
-    receivemsg,
+    receiveMsgFromDLQ,
 };
