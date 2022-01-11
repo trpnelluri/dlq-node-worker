@@ -1,19 +1,13 @@
 'use strict'
 
 const AWS = require('aws-sdk')
-const IdServiceShared = require('../sharedLib/common/id-service');
 
-// Set the region to us-west-2
-AWS.config.update({ region: 'us-east-2' })
-
+AWS.config.update({ region: 'us-east-1' })
 // Create the SQS service object
 let sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
 
-//let sourceQueueURL = 'https://sqs.us-east-1.amazonaws.com/026933153449/audit-trans-deadletter.fifo'
-//let targetQueueQRL = 'https://sqs.us-east-1.amazonaws.com/026933153449/audit_trans_test.fifo'
-
-let targetQueueQRL = 'https://sqs.us-east-1.amazonaws.com/026933153449/audit-trans-deadletter.fifo'
-let sourceQueueURL = 'https://sqs.us-east-1.amazonaws.com/026933153449/audit_trans_test.fifo'
+let sourceQueueURL = process.env.dlq_hih_notifications_queue
+let targetQueueQRL = process.env.main_hih_notifications_queue
 
 function receivemsg () {
     
@@ -41,8 +35,8 @@ function receivemsg () {
                                 
                 let messageGroupId = data.Messages[0].Attributes.MessageGroupId;
                 let msgBody = data.Messages[0].Body
-                let messageDeduplicationId = IdServiceShared.getInstance().getId();
-                console.log(`New messageDeduplicationId: ${messageDeduplicationId}`)
+                let messageDeduplicationId = data.Messages[0].Attributes.MessageDeduplicationId
+                //console.log(`New messageDeduplicationId: ${messageDeduplicationId}`)
                 console.log(`targetQueueQRL: ${targetQueueQRL}`)
 
                 const SQS_DLQ_PARAMS = {

@@ -14,7 +14,6 @@ router.get('/esmd-dlk-epor-status', controller.processEporStatusDLQ);
 router.get('/esmd-dlk-metadata-processor', controller.processMetadataDLQ);
 router.get('/esmd-dlk-payload-processor', controller.processPayloadProcessDLQ);
 router.get('/esmd-dlk-transaction-queue', controller.processTransactionDLQ);
-
-//router.get('/esmd-dlk-hih-notifications', controller.processHihNotificationsDLQ);
+router.get('/esmd-dlk-hih-notifications', controller.processHIHNotificationsDLQ);
 
 module.exports = router;

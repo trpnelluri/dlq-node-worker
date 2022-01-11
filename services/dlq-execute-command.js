@@ -3,13 +3,11 @@
 const exec = require('shelljs').exec;
 
 exports.executeDLQCommand = async function(res, sourceQueue, targetQueue){
-    const processDLQCommand = `npx replay-aws-dlq ${sourceQueue} ${targetQueue}`
-    console.log(`processDLQCommand: ${processDLQCommand}`)
+    const cliDLQCommand = `npx replay-aws-dlq ${sourceQueue} ${targetQueue}`
+    console.log(`cliDLQCommand: ${cliDLQCommand}`)
     // eslint-disable-next-line no-unused-vars
-    const curlProfileRefXMLdlq = exec(processDLQCommand, function(error, profilestdout, stderr) {
-        //console.log(`curlProfileRefXML: ${curlProfileRefXMLdlq} stderr: ${stderr}`)
-        console.log(`profilestdout: ${profilestdout}`)
+    const curlProfileRefXMLdlq = exec(cliDLQCommand, function(error, stdout, stderr) {
+        console.log(`profilestdout: ${stdout}`)
         res.send('audittransdlqstart world 345');
     })
-
 }

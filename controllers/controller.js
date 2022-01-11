@@ -1,6 +1,5 @@
 'use strict'
 
-//const exec = require('shelljs').exec;
 const processDLQ = require('../services/dlq-execute-command')
 
 exports.hello = (req, res) => {
@@ -55,44 +54,11 @@ exports.processTransactionDLQ = (req, res) => {
     processDLQ.executeDLQCommand(res, sourceQueue, targetQueue)
 };
 
-/*
-exports.processdlq = (req, res) => {
-    console.log(`req.headers: ${JSON.stringify(req.headers)}`)
-    //const dlqtest = require('../services/dlq-process-service-test')
-    //dlqtest.receivemsg();
-    //const dlqtestConsumer = require('../services/dlq-process-service')
-    let SOURCE_SQS_URL = 'https://sqs.us-east-1.amazonaws.com/026933153449/audit_trans_test.fifo'
-    let TARGET_SQS_URL = 'https://sqs.us-east-1.amazonaws.com/026933153449/audit-trans-deadletter.fifo'
-    //dlqtestConsumer.startAuditTransSqsService(SOURCE_SQS_URL, TARGET_SQS_URL);
-    //res.send('audittransdlqstart world 123');
-
-    const curlCommand = `npx replay-aws-dlq ${SOURCE_SQS_URL} ${TARGET_SQS_URL}`
-
-    const curlProfileRefXMLdlq = exec(curlCommand, function(error, profilestdout, stderr) {
-        console.log(`curlProfileRefXML: ${curlProfileRefXMLdlq}`)
-        console.log(`profilestdout: ${profilestdout}`)
-        res.send('audittransdlqstart world 345');
-    })
+exports.processHIHNotificationsDLQ = (req, res) => {
+    console.log(`processHIHNotificationsDLQ req.headers: ${JSON.stringify(req.headers)}`)
+    let sourceQueue = process.env.dlq_2_hih_notifications_queue
+    let targetQueue = process.env.main_hih_notifications_queue
+    console.log(`processHIHNotificationsDLQ sourceQueue: ${sourceQueue} targetQueue: ${targetQueue}`)
+    processDLQ.executeDLQCommand(res, sourceQueue, targetQueue)
 };
-
-
-exports.processdlqConsumer = (req, res) => {
-    console.log(`req.headers: ${JSON.stringify(req.headers)}`)
-
-    //const dlqtestConsumer = require('../services/dlq-process-service')
-    let SOURCE_SQS_URL = 'https://sqs.us-east-1.amazonaws.com/026933153449/audit-trans-deadletter.fifo'
-    let TARGET_SQS_URL = 'https://sqs.us-east-1.amazonaws.com/026933153449/audit_trans_test.fifo'
-
-    const curlCommand = `npx replay-aws-dlq ${SOURCE_SQS_URL} ${TARGET_SQS_URL}`
-
-    const curlProfileRefXML = exec(curlCommand, function(error, profilestdout, stderr) {
-        console.log(`curlProfileRefXML: ${curlProfileRefXML}`)
-        console.log(`profilestdout: ${profilestdout}`)
-        res.send('audittransdlqstart world 123');
-    })
-    //dlqtestConsumer.startAuditTransSqsService(SOURCE_SQS_URL, TARGET_SQS_URL);
-    
-};
-*/
-
 
