@@ -1,7 +1,7 @@
 'use strict'
 
 const processDLQ = require('../services/dlq-execute-command')
-const processReceiveMessage = require('../services-utils/receive-and-process-dlq-messages')
+const processReceiveMessage = require('../services/receive-and-process-dlq-messages')
 
 exports.hello = (req, res) => {
     res.send('Welcome to Unissant');

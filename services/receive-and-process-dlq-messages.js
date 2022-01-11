@@ -2,7 +2,8 @@
 
 const AWS = require('aws-sdk')
 const dateTimeUtils = require('../sharedLib/common/date-time-utils');
-const IdServiceShared = require('../sharedLib/common/id-service')
+//const IdServiceShared = require('../sharedLib/common/id-service')
+const sendMsgToMainQueue = require('../services-utils/send-message-to-main-queue')
 
 
 AWS.config.update({ region: 'us-east-1' })
@@ -10,16 +11,12 @@ AWS.config.update({ region: 'us-east-1' })
 let sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
 
 let sourceQueueURL = process.env.dlq_hih_notifications_queue
-let targetQueueQRL = process.env.main_hih_notifications_queue
-let targetDLQQRL = process.env.dlq_2_hih_notifications_queue
 //const visibilityTimeout = process.env.visibilitytimeout
 //const hihNotifyReprocessTimeInMins = process.env.hihnotificationreprocesstime
 const visibilityTimeout = 120
 const hihNotifyReprocessTimeInMins = 3
-const msgMaxRetrys = 3
-const msgFirstAttempt = 1
 
-console.log(`sourceQueueURL: ${sourceQueueURL} targetQueueQRL ${targetQueueQRL} visibilityTimeout: ${visibilityTimeout} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins}`)
+console.log(`sourceQueueURL: ${sourceQueueURL} visibilityTimeout: ${visibilityTimeout} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins}`)
 
 async function receiveMsgFromDLQ () {
     
@@ -51,6 +48,12 @@ async function receiveMsgFromDLQ () {
                 console.log(`msgReceivedTimeDiff: ${msgReceivedTimeDiff}`);
 
                 if ( msgReceivedTimeDiff > hihNotifyReprocessTimeInMins ) {
+
+                    let response = await sendMsgToMainQueue.sendMsgToMainQueue(Messages[i], sourceQueueURL)
+
+                    console.log(`response: ${JSON.stringify(response)}`)
+
+                    /*
                     console.log('Moving the message to Main queue')
                     let messageId = Messages[i].MessageId;
                     let receiptHandle = Messages[i].ReceiptHandle;
@@ -117,6 +120,7 @@ async function receiveMsgFromDLQ () {
                             
                         }           // successful response
                     })
+                    */
                 } else {
                     console.log(`${msgReceivedTimeDiff} is less than ${hihNotifyReprocessTimeInMins}`)
                 }
