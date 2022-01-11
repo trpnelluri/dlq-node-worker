@@ -7,25 +7,22 @@ AWS.config.update({ region: 'us-east-1' })
 // Create the SQS service object
 let sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
 
-let sourceQueueURL = process.env.dlq_hih_notifications_queue
 let targetQueueQRL = process.env.main_hih_notifications_queue
 let targetDLQQRL = process.env.dlq_2_hih_notifications_queue
-const msgMaxRetrys = 3
+const msgMaxRetrys = process.env.hihnotificationmaxretrys
 const msgFirstAttempt = 1
-
-console.log(`sourceQueueURL: ${sourceQueueURL} targetQueueQRL ${targetQueueQRL} `)
 
 async function sendMsgToMainQueue (message, sourceQueueURL) {
 
     return new Promise((resolve, reject) => {
+
         try {
+
+            console.log(`targetQueueQRL ${targetQueueQRL} targetDLQQRL: ${targetDLQQRL} msgMaxRetrys: ${msgMaxRetrys} msgFirstAttempt: ${msgFirstAttempt} `)
             let messageId = message.MessageId;
             let receiptHandle = message.ReceiptHandle;
-            console.log(`data.messageId: ${messageId} receiptHandle: ${receiptHandle}`)
-            console.log(`data.MessageDeduplicationId: ${message.Attributes.MessageDeduplicationId}`)
-            //console.log (`data.Messages[0].MessageAttributes['sqs-dlq-replay-nb']: ${data.Messages[0].MessageAttributes['sqs-dlq-replay-nb']}`)
-            console.log(`msgMaxRetrys: ${msgMaxRetrys}`)
-    
+            let messageDeduplicationId = message.Attributes.MessageDeduplicationId
+            console.log(`data.messageId: ${messageId} receiptHandle: ${receiptHandle} messageDeduplicationId: ${messageDeduplicationId} `)
             let nbReplay;
             if ( message.MessageAttributes !== undefined ) {
                 nbReplay = parseInt(message.MessageAttributes['sqs-dlq-replay-nb']['StringValue'])
@@ -37,7 +34,7 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
     
             let messageGroupId = message.Attributes.MessageGroupId;
             let msgBody = message.Body
-            let messageDeduplicationId = IdServiceShared.getInstance().getId();
+            messageDeduplicationId = IdServiceShared.getInstance().getId();
             console.log(`New messageDeduplicationId: ${messageDeduplicationId}`)
         
             if ( nbReplay > msgMaxRetrys ) {
