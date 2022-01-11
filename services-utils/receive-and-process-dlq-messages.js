@@ -1,7 +1,7 @@
 'use strict'
 
 const AWS = require('aws-sdk')
-//const moment = require('moment');
+const dateTimeUtils = require('../sharedLib/common/date-time-utils');
 
 AWS.config.update({ region: 'us-east-1' })
 // Create the SQS service object
@@ -28,38 +28,29 @@ async function receiveMsgFromDLQ () {
 
     const { Messages } = await sqs.receiveMessage(params).promise();
 
-    if ( Messages.length > 0 ) {
-        console.log(`Messages.length: ${Messages.length}`)
+    console.log(`Messages: ${Messages}`)
 
-        Messages.forEach((message) => {
-            console.log(`message: ${JSON.stringify(message)}`)
-            console.log(`message.Attributes.ApproximateFirstReceiveTimestamp: ${message.Attributes.ApproximateFirstReceiveTimestamp}`)
-            let stringtoEpocDate = message.Attributes.ApproximateFirstReceiveTimestamp
-        
-            let myDate = new Date( stringtoEpocDate * 1 * 1000);
-            console.log(`myDate.toLocaleString(): ${myDate.toLocaleString()}`);
-            
-            let date = new Date();
-            let timestamp = Math.floor(date.getTime());
-            console.log(`timestamp: ${timestamp}`)
+    if (Messages !== undefined && Messages !== null) {
+        if ( Messages.length > 0 ) {
+            console.log(`Messages.length: ${Messages.length}`)
 
-            let currentTime = new Date();
-	        let getCurrentTimeInMilliSecs = currentTime.getTime();
-            console.log(`getCurrentTimeInMilliSecs: ${getCurrentTimeInMilliSecs}`)
-            
-            let differenceinTime = getCurrentTimeInMilliSecs - stringtoEpocDate
+            for (let i = 0; i < Messages.length; i++) {
+                console.log(`message: ${JSON.stringify(Messages[i])}`)
+                let msgReceviedTime = Messages[i].Attributes.ApproximateFirstReceiveTimestamp
+                console.log(`msgReceviedTime: ${msgReceviedTime}`);
+    
+                let currentTime = await dateTimeUtils.currentTimeInMilliSecs()
+                console.log(`currentTime: ${currentTime}`);
+    
+                const msgReceivedTimeDiff = await dateTimeUtils.processTimeInMins(currentTime, msgReceviedTime)
+                console.log(`msgReceivedTimeDiff: ${msgReceivedTimeDiff}`);
 
-            console.log(`differenceinTime: ${differenceinTime}`)
-
-            let min = differenceinTime / 60000
-
-            console.log(`min: ${min}`)
-
-            if ( min > 110 ) {
-                console.log(`min is greater than 110: ${min}`)
             }
-        })
+        }
+    } else {
+        console.log('mesages not available to process')
     }
+    
 
     /*
     sqs.receiveMessage(params, function (err, data) {
