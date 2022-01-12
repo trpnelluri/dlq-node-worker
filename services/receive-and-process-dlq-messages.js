@@ -13,10 +13,11 @@ const maxNumberOfMessages = process.env.messagesbatchsize
 const EventName = 'DLQ-RECEIVE-MSG'
 const logger = loggerUtils.customLogger( EventName, {});
 
+logger.info(`sourceQueueURL: ${sourceQueueURL} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} maxNumberOfMessages: ${maxNumberOfMessages} `)
+
 async function receiveMsgFromDLQ () {
 
     try {
-        logger.info(`receiveMsgFromDLQ sourceQueueURL: ${sourceQueueURL} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} maxNumberOfMessages: ${maxNumberOfMessages} `)
         let params = {
             AttributeNames: ['All'],
             MaxNumberOfMessages: maxNumberOfMessages,
