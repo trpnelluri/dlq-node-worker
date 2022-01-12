@@ -5,7 +5,7 @@ const express = require('express');
 const config = require('dotenv').config({ path: './config/.env' });
 const ParameterStoreData = require('./sharedLib/aws/parameter-store-service');
 ParameterStoreData.loadEnvVariablesFromAWSParamStore();
-const scheduleCronJob = require('./services/schedule-batch-job-HIH-dlq')
+const scheduleCronJob = require('./services/schedule-cron-job-HIH-dlq')
 const loggerUtils = require('./sharedLib/common/logger-utils');
 const EventName = 'DLQWORKER';
 let logParams = {};

@@ -5,6 +5,7 @@ const moment = require('moment');
 process.setMaxListeners(0);
 
 const timestampMoment = () => moment().format('YYYY/MM/DD HH:mm:ss SSS');
+const workerName = 'DLQ-Node-Worker'
 
 const customLogger = (eventName, logParams) =>{
     //console.log('in logger utils', logFileName)
@@ -15,7 +16,7 @@ const customLogger = (eventName, logParams) =>{
             new winston.transports.Console({
                 format: winston.format.combine(
                     winston.format.timestamp({ format: timestampMoment }),
-                    winston.format.printf((info) => `${info.timestamp},${info.level.toUpperCase()},${logParams.globaltransid || '-' },${eventName},-, ${info.message}`),
+                    winston.format.printf((info) => `${info.timestamp},${info.level.toUpperCase()},${workerName},${logParams.globaltransid || '-' },${eventName},-, ${info.message}`),
                 ),
             }),
         ],

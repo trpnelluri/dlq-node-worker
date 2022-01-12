@@ -1,13 +1,16 @@
 'use strict'
 
 const AWS = require('aws-sdk')
+const loggerUtils = require('../sharedLib/common/logger-utils');
 const IdServiceShared = require('../sharedLib/common/id-service')
 
 AWS.config.update({ region: 'us-east-1' })
 let sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
+const EventName = 'DLQ-SEND-MSG'
+const logger = loggerUtils.customLogger( EventName, {});
 
 let targetQueueQRL = process.env.main_hih_notifications_queue
-let targetDLQQRL = process.env.dlq_2_hih_notifications_queue
+const targetDLQQRL = process.env.dlq_2_hih_notifications_queue
 const msgMaxRetrys = process.env.hihnotificationmaxretrys
 const msgFirstAttempt = 1
 
@@ -17,11 +20,11 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
 
         try {
 
-            console.log(`targetQueueQRL ${targetQueueQRL} targetDLQQRL: ${targetDLQQRL} msgMaxRetrys: ${msgMaxRetrys} msgFirstAttempt: ${msgFirstAttempt} `)
+            logger.info(`sendMsgToMainQueue targetQueueQRL ${targetQueueQRL} targetDLQQRL: ${targetDLQQRL} msgMaxRetrys: ${msgMaxRetrys} msgFirstAttempt: ${msgFirstAttempt} `)
             let messageId = message.MessageId;
             let receiptHandle = message.ReceiptHandle;
             let messageDeduplicationId = message.Attributes.MessageDeduplicationId
-            console.log(`data.messageId: ${messageId} receiptHandle: ${receiptHandle} messageDeduplicationId: ${messageDeduplicationId} `)
+            logger.info(`sendMsgToMainQueue data.messageId: ${messageId} receiptHandle: ${receiptHandle} messageDeduplicationId: ${messageDeduplicationId} `)
             let nbReplay;
             if ( message.MessageAttributes !== undefined ) {
                 nbReplay = parseInt(message.MessageAttributes['sqs-dlq-replay-nb']['StringValue'])
@@ -29,20 +32,16 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
             } else {
                 nbReplay = msgFirstAttempt
             }
-            console.log(`nbReplay: ${nbReplay}`)
-    
             let messageGroupId = message.Attributes.MessageGroupId;
             let msgBody = message.Body
             messageDeduplicationId = IdServiceShared.getInstance().getId();
-            console.log(`New messageDeduplicationId: ${messageDeduplicationId}`)
+            logger.info(`sendMsgToMainQueue nbReplay: ${nbReplay} New messageDeduplicationId: ${messageDeduplicationId}`)
         
             if ( nbReplay > msgMaxRetrys ) {
                 targetQueueQRL = targetDLQQRL
                 nbReplay = 0
             }
-        
-            console.log(`targetQueueQRL: ${targetQueueQRL}`)
-        
+            logger.debug(`targetQueueQRL: ${targetQueueQRL}`)
             const sendMsgParams = {
                 MessageBody: msgBody,
                 QueueUrl: targetQueueQRL,
@@ -55,27 +54,27 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
                     }
                 }
             }
-            console.log(`sendMsgParams: ${JSON.stringify(sendMsgParams)}`)
+            logger.info(`sendMsgToMainQueue sendMsgParams: ${JSON.stringify(sendMsgParams)}`)
                             
             sqs.sendMessage(sendMsgParams, function(err, data) {
                 if (err) { // an error occurred
-                    console.log(err, err.stack);
+                    logger.error(`sendMessage Error ${err.stack}`);
                 } else {
-                    console.log(`sendMessage data: ${JSON.stringify(data)}`);
+                    logger.info(`sendMessage data: ${JSON.stringify(data)}`);
                     let deleteMsgParams = {
                         QueueUrl: sourceQueueURL,
                         ReceiptHandle: receiptHandle
                     }
                     sqs.deleteMessage(deleteMsgParams, function(error, data) {
                         if (error) {
-                            console.log(`Error in deleting Queue message, incase of moving file from dlq to main queue:  ${JSON.stringify(error, null, 2)}`);
+                            logger.error(`Error in deleting Queue message, incase of moving file from dlq to main queue:  ${JSON.stringify(error, null, 2)}`);
                             let response = {
                                 status: 'failure',
                                 message: 'deleting message from dlq'
                             }
                             reject(response)
                         } else {
-                            console.log(`deleted message from dlq data: ${JSON.stringify(data)}`);
+                            logger.info(`deleteMessage deleted message from dlq data: ${JSON.stringify(data)}`);
                             let response = {
                                 status: 'success',
                                 message: data
@@ -84,12 +83,10 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
                         }
                     });
                                 
-                }           // successful response
+                }
             })
-
         }catch (err) {
-
-            console.error(`ERROR in sendMsgToMainQueue: ${err.stack}`);
+            logger.error(`ERROR in sendMsgToMainQueue: ${err.stack}`);
             reject(err);
         }
     })
