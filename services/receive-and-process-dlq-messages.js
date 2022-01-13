@@ -26,7 +26,7 @@ async function receiveMsgFromDLQ () {
             QueueUrl: sourceQueueURL //DLQ1
         }
 
-        logger.info(`receiveMsgFromDLQ params: ${JSON.stringify(params)}`)
+        logger.debug(`receiveMsgFromDLQ params: ${JSON.stringify(params)}`)
         const { Messages } = await sqs.receiveMessage(params).promise();
 
         logger.debug(`receiveMsgFromDLQ Messages: ${Messages}`)

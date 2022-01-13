@@ -1,9 +1,10 @@
 'use strict'
 
 const scheduleJobType = process.env.schedulejobrunin //seconds or minutes
-const runOnWeekEnds = process.env.scheduletorunonweekends //yes or no
+const runOnWeekEnds = process.env.scheduletorunonweekends //yes or no^days to run
 const jobScheduleTimeMins = process.env.schedulejobinmins // time in mins the Job should trigger
 const jobScheduleTimeSecs = process.env.schedulejobinsecs // time in secs the Job should trigger
+const scheduleNightly = process.env.schedulenightly //yes or no^hours to run
 /*
 NOTE: scheduleJob Propety is '* * * * * *'
 Explanation: 
@@ -26,19 +27,50 @@ async function populateScheduleJobTriggerParam ( logger ){
             logger.info(`populateScheduleJobTriggerParam scheduleJobType: ${scheduleJobType} runOnWeekEnds: ${runOnWeekEnds} jobScheduleTimeMins: ${jobScheduleTimeMins} jobScheduleTimeSecs: ${jobScheduleTimeSecs} `)
             let scheduleParam = ''
             let msgForLogger = ''
+            let scheduleHours = '*'
+
+            //Check to verify nightly run enable or not
+            if ( scheduleNightly !== undefined ) {
+                let arrScheNightly = scheduleNightly.split('^')
+                let paramScheNightly = arrScheNightly[0].toLowerCase()
+                let hoursToRun = arrScheNightly[1]
+                if ( paramScheNightly === 'no') {
+                    if ( hoursToRun === undefined || hoursToRun === null ) {
+                        scheduleHours = '6-20'
+                    } else {
+                        scheduleHours = hoursToRun
+                    }
+                    msgForLogger = 'Task disabled nightly and is running every'
+
+                } else {
+                    msgForLogger = 'Task is running every'
+                }
+            }
+
+            //Check to schedule the job in seconds or minitues
             if (scheduleJobType.toLowerCase() === 'seconds') {
-                scheduleParam = `*/${jobScheduleTimeSecs} * * * * *`
-                msgForLogger = `${jobScheduleTimeSecs} Secs`
+                scheduleParam = `*/${jobScheduleTimeSecs} * ${scheduleHours} * * *`
+                msgForLogger = `${msgForLogger} ${jobScheduleTimeSecs} Secs`
             } else {
-                scheduleParam = `*/${jobScheduleTimeMins} * * * *`
-                msgForLogger = `${jobScheduleTimeMins} Mins`
+                scheduleParam = `*/${jobScheduleTimeMins} ${scheduleHours} * * *`
+                msgForLogger = `${msgForLogger} ${jobScheduleTimeMins} Mins`
             }
             logger.debug(`scheduleParam: ${scheduleParam}`)
-            if ( runOnWeekEnds.toLowerCase() === 'no') {
-                scheduleParam = scheduleParam.replace(/.$/, '1-5')
-                msgForLogger = `${msgForLogger} on Weekdays.`
+
+            //Check to verify run on weekends
+            if ( runOnWeekEnds !== undefined ) {
+                let arrRunOnWeekEnds = runOnWeekEnds.split('^')
+                let paramRunOnWeekEnds = arrRunOnWeekEnds[0].toLowerCase()
+                let daysToRun = arrRunOnWeekEnds[1]
+                if ( paramRunOnWeekEnds === 'no') {
+                    if ( daysToRun === undefined || daysToRun === null ) {
+                        daysToRun = '1-5'
+                    }
+                    scheduleParam = scheduleParam.replace(/.$/, daysToRun)
+                    msgForLogger = `${msgForLogger} on Weekdays.`
+                }
             }
-            //TBD: Need to investigate and implement the process to stop after 8PM and start at 6AM next day 
+           
             let returnParam = `${scheduleParam}^${msgForLogger}`
             logger.info(`populateScheduleJobTriggerParam scheduleParam: ${scheduleParam} msgForLogger: ${msgForLogger}`)
             resolve(returnParam)

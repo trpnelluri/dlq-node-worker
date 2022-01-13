@@ -20,7 +20,7 @@ async function scheduleProcessHIHDlq () {
     let msgForLogger = arrScheduleJobConfigData[1]
  
     schedule.scheduleJob(jobSchedule, () =>{
-        logger.debug(`Task is running every ${msgForLogger} ${new Date()} `)
+        logger.debug(`${msgForLogger} ${new Date()} `)
         processDLQMessage.receiveMsgFromDLQ()
     });
 }
