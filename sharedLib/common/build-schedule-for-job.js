@@ -36,7 +36,7 @@ async function populateScheduleJobTriggerParam ( logger ){
                 let hoursToRun = arrScheNightly[1]
                 if ( paramScheNightly === 'no') {
                     if ( hoursToRun === undefined || hoursToRun === null ) {
-                        scheduleHours = '6-20'
+                        scheduleHours = '6-19'
                     } else {
                         scheduleHours = hoursToRun
                     }
