@@ -5,7 +5,7 @@ const runOnWeekEnds = process.env.cronrunonweekends //yes or no
 const cronTriggerTimeMins = process.env.crontriggertimeinmins
 const cronTriggerTimeSecs = process.env.crontriggertimeinsecs
 /*
-NOTE: Cron job Schedule Propety is '* * * * * *'
+NOTE: scheduleJob Propety is '* * * * * *'
 Explanation: 
     1st star: seconds(Optional)
     2nd star: minute
@@ -20,35 +20,35 @@ Explanation:
 NOTE: The following function is used to build the cron job schedule based on the values provided 
     in parameter store configuration.
 */
-async function populateCronJobTriggerParam ( logger ){
+async function populateScheduleJobTriggerParam ( logger ){
     return new Promise((resolve, reject) => {
         try {
-            logger.info(`triggerType: ${triggerType} runOnWeekEnds: ${runOnWeekEnds} cronTriggerTimeMins: ${cronTriggerTimeMins} cronTriggerTimeSecs: ${cronTriggerTimeSecs} `)
-            let cronParam = ''
+            logger.info(`populateScheduleJobTriggerParam triggerType: ${triggerType} runOnWeekEnds: ${runOnWeekEnds} cronTriggerTimeMins: ${cronTriggerTimeMins} cronTriggerTimeSecs: ${cronTriggerTimeSecs} `)
+            let scheduleParam = ''
             let msgForLogger = ''
             if (triggerType.toLowerCase() === 'seconds') {
-                cronParam = `*/${cronTriggerTimeSecs} * * * * *`
+                scheduleParam = `*/${cronTriggerTimeSecs} * * * * *`
                 msgForLogger = `${cronTriggerTimeSecs} Secs`
             } else {
-                cronParam = `*/${cronTriggerTimeMins} * * * *`
+                scheduleParam = `*/${cronTriggerTimeMins} * * * *`
                 msgForLogger = `${cronTriggerTimeMins} Mins`
             }
-            logger.debug(`cronParam: ${cronParam}`)
+            logger.debug(`scheduleParam: ${scheduleParam}`)
             if ( runOnWeekEnds.toLowerCase() === 'no') {
-                cronParam = cronParam.replace(/.$/, '1-5')
+                scheduleParam = scheduleParam.replace(/.$/, '1-5')
                 msgForLogger = `${msgForLogger} on Weekdays.`
             }
-            let returnParam = `${cronParam}^${msgForLogger}`
-            logger.info(`cronParam: ${cronParam} msgForLogger: ${msgForLogger}`)
+            let returnParam = `${scheduleParam}^${msgForLogger}`
+            logger.info(`populateScheduleJobTriggerParam scheduleParam: ${scheduleParam} msgForLogger: ${msgForLogger}`)
             resolve(returnParam)
     
         } catch(err) {
-            logger.error(`ERROR in populateCronJobTriggerParam: ${err.stack}`);
+            logger.error(`ERROR in populateScheduleJobTriggerParam: ${err.stack}`);
             reject(err);
         }
     })
 }
 
 module.exports = {
-    populateCronJobTriggerParam,
+    populateScheduleJobTriggerParam,
 }

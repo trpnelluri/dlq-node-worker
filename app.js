@@ -5,7 +5,7 @@ const express = require('express');
 const config = require('dotenv').config({ path: './config/.env' });
 const ParameterStoreData = require('./sharedLib/aws/parameter-store-service');
 ParameterStoreData.loadEnvVariablesFromAWSParamStore();
-const scheduleCronJob = require('./services/schedule-cron-job-HIH-dlq')
+const scheduleCronJob = require('./services/schedule-job-HIH-dlq')
 const loggerUtils = require('./sharedLib/common/logger-utils');
 const EventName = 'DLQWORKER';
 let logParams = {};
@@ -16,6 +16,6 @@ const port = process.env.port || 8090;
 app.listen(port, () => {
     logger.info(`listining on port: ${port}`);
     // The following function invoke the sqs message consumer service when ever the application starts.
-    scheduleCronJob.scheduleHIHDlqCron();
-    logger.info('scheduleHiHDlqCron Started');
+    scheduleCronJob.scheduleProcessHIHDlq();
+    logger.info('scheduleProcessHIHDlq Job Started');
 });
