@@ -2,8 +2,8 @@
 
 const scheduleJobType = process.env.schedulejobrunin //seconds or minutes
 const runOnWeekEnds = process.env.scheduletorunonweekends //yes or no
-const jobScheduleTimeMins = process.env.schedulejobinmins
-const jobScheduleTimeSecs = process.env.schedulejobinsecs
+const jobScheduleTimeMins = process.env.schedulejobinmins // time in mins the Job should trigger
+const jobScheduleTimeSecs = process.env.schedulejobinsecs // time in secs the Job should trigger
 /*
 NOTE: scheduleJob Propety is '* * * * * *'
 Explanation: 
@@ -38,6 +38,7 @@ async function populateScheduleJobTriggerParam ( logger ){
                 scheduleParam = scheduleParam.replace(/.$/, '1-5')
                 msgForLogger = `${msgForLogger} on Weekdays.`
             }
+            //TBD: Need to investigate and implement the process to stop after 8PM and start at 6AM next day 
             let returnParam = `${scheduleParam}^${msgForLogger}`
             logger.info(`populateScheduleJobTriggerParam scheduleParam: ${scheduleParam} msgForLogger: ${msgForLogger}`)
             resolve(returnParam)
