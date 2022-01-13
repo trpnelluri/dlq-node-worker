@@ -29,6 +29,7 @@
     "moment": "^2.29.1",
     "node-cache": "^5.1.2",
     "node-cron": "^3.0.0",
+    "node-schedule": "^2.1.0",
     "nodemon": "^2.0.7",
     "replay-aws-dlq": "^1.0.1",
     "shelljs": "^0.8.5",

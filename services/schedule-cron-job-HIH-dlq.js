@@ -1,6 +1,7 @@
 'use strict';
 
-const cron = require('node-cron');
+//const cron = require('node-cron');
+const schedule = require('node-schedule');
 const processDLQMessage = require('./receive-and-process-dlq-messages');
 const populateCronSchedule = require('../sharedLib/common/build-cron-schedule')
 const loggerUtils = require('../sharedLib/common/logger-utils');
@@ -18,7 +19,12 @@ async function scheduleHIHDlqCron () {
     let arrayCronScheduleData = cronScheduleData.split('^')
     let cronSchedule = arrayCronScheduleData[0]
     let msgForLogger = arrayCronScheduleData[1]
-    cron.schedule(cronSchedule, () =>{
+    // cron.schedule(cronSchedule, () =>{
+    //     logger.debug(`Task is running every ${msgForLogger} ${new Date()} `)
+    //     processDLQMessage.receiveMsgFromDLQ()
+    // });
+
+    schedule.scheduleJob(cronSchedule, () =>{
         logger.debug(`Task is running every ${msgForLogger} ${new Date()} `)
         processDLQMessage.receiveMsgFromDLQ()
     });
