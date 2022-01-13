@@ -1,6 +1,6 @@
 'use strict'
 
-const processDLQ = require('../services/dlq-execute-command')
+const processDLQ = require('../services-utils/dlq-execute-command')
 const loggerUtils = require('../sharedLib/common/logger-utils');
 
 const EventName = 'DLQWORKERCONTROLLER'
