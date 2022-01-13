@@ -1,7 +1,6 @@
 'use strict'
 
 const processDLQ = require('../services/dlq-execute-command')
-const processReceiveMessage = require('../services/receive-and-process-dlq-messages')
 const loggerUtils = require('../sharedLib/common/logger-utils');
 
 const EventName = 'DLQWORKERCONTROLLER'
@@ -70,11 +69,14 @@ exports.processHIHNotificationsDLQ = (req, res) => {
     processDLQ.executeDLQCommand(res, logger, sourceQueue, targetQueue)
 };
 
-//temp:
+/*
+msgMaxRetries
 exports.processHIHNotificationsDLQ1 = (req, res) => {
+    //const processReceiveMessage = require('../services/receive-and-process-dlq-messages')
     logger.info(`processHIHNotificationsDLQ req.headers: ${JSON.stringify(req.headers)}`)
     let sourceQueue = process.env.dlq_hih_notifications_queue
     let targetQueue = process.env.main_hih_notifications_queue
     logger.debug(`processHIHNotificationsDLQ1 sourceQueue: ${sourceQueue} targetQueue: ${targetQueue}`)
     processReceiveMessage.receiveMsgFromDLQ();
 };
+*/

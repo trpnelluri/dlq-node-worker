@@ -6,12 +6,12 @@ const IdServiceShared = require('../sharedLib/common/id-service')
 
 AWS.config.update({ region: 'us-east-1' })
 let sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
-const EventName = 'DLQ-SEND-MSG'
+const EventName = 'Send_Message'
 const logger = loggerUtils.customLogger( EventName, {});
 
 let targetQueueQRL = process.env.main_hih_notifications_queue
 const targetDLQQRL = process.env.dlq_2_hih_notifications_queue
-const msgMaxRetrys = process.env.hihnotificationmaxretrys
+const msgMaxRetries = process.env.hihnotificationmaxretries
 const msgFirstAttempt = 1
 
 async function sendMsgToMainQueue (message, sourceQueueURL) {
@@ -20,7 +20,7 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
 
         try {
 
-            logger.info(`sendMsgToMainQueue targetQueueQRL ${targetQueueQRL} targetDLQQRL: ${targetDLQQRL} msgMaxRetrys: ${msgMaxRetrys} msgFirstAttempt: ${msgFirstAttempt} `)
+            logger.info(`sendMsgToMainQueue targetQueueQRL ${targetQueueQRL} targetDLQQRL: ${targetDLQQRL} msgMaxRetries: ${msgMaxRetries} msgFirstAttempt: ${msgFirstAttempt} `)
             let messageId = message.MessageId;
             let receiptHandle = message.ReceiptHandle;
             let messageDeduplicationId = message.Attributes.MessageDeduplicationId
@@ -37,7 +37,7 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
             messageDeduplicationId = IdServiceShared.getInstance().getId();
             logger.info(`sendMsgToMainQueue nbReplay: ${nbReplay} New messageDeduplicationId: ${messageDeduplicationId}`)
         
-            if ( nbReplay > msgMaxRetrys ) {
+            if ( nbReplay > msgMaxRetries ) {
                 targetQueueQRL = targetDLQQRL
                 nbReplay = 0
             }

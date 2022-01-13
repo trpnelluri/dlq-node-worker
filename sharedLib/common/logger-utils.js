@@ -5,7 +5,7 @@ const moment = require('moment');
 process.setMaxListeners(0);
 
 const timestampMoment = () => moment().format('YYYY/MM/DD HH:mm:ss SSS');
-const workerName = 'DLQ-Node-Worker'
+const workerName = 'process-dlq-node-worker'
 
 const customLogger = (eventName, logParams) =>{
     //console.log('in logger utils', logFileName)

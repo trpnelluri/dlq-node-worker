@@ -10,8 +10,9 @@ const sendMsgToMainQueue = require('../services-utils/send-message-to-main-queue
 const sourceQueueURL = process.env.dlq_hih_notifications_queue
 const hihNotifyReprocessTimeInMins = process.env.hihnotificationreprocesstime
 const maxNumberOfMessages = process.env.messagesbatchsize
-const EventName = 'DLQ-RECEIVE-MSG'
+const EventName = 'Receive_Message'
 const logger = loggerUtils.customLogger( EventName, {});
+
 
 logger.info(`sourceQueueURL: ${sourceQueueURL} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} maxNumberOfMessages: ${maxNumberOfMessages} `)
 

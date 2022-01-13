@@ -1,9 +1,9 @@
 'use strict'
 
-const triggerType = process.env.cronjobtriggertype //seconds or minutes
-const runOnWeekEnds = process.env.cronrunonweekends //yes or no
-const cronTriggerTimeMins = process.env.crontriggertimeinmins
-const cronTriggerTimeSecs = process.env.crontriggertimeinsecs
+const scheduleJobType = process.env.schedulejobrunin //seconds or minutes
+const runOnWeekEnds = process.env.scheduletorunonweekends //yes or no
+const jobScheduleTimeMins = process.env.schedulejobinmins
+const jobScheduleTimeSecs = process.env.schedulejobinsecs
 /*
 NOTE: scheduleJob Propety is '* * * * * *'
 Explanation: 
@@ -13,25 +13,25 @@ Explanation:
     4th star: day of month
     5th star: month
     6th star: day of week (0 is Sunday and 6 is Saturday)
-    if you need more info please refer node-cron npm
+    if you need more info please refer node-schedule npm
 */
 
 /*
-NOTE: The following function is used to build the cron job schedule based on the values provided 
+NOTE: The following function is used to build the schedule job based on the values provided 
     in parameter store configuration.
 */
 async function populateScheduleJobTriggerParam ( logger ){
     return new Promise((resolve, reject) => {
         try {
-            logger.info(`populateScheduleJobTriggerParam triggerType: ${triggerType} runOnWeekEnds: ${runOnWeekEnds} cronTriggerTimeMins: ${cronTriggerTimeMins} cronTriggerTimeSecs: ${cronTriggerTimeSecs} `)
+            logger.info(`populateScheduleJobTriggerParam scheduleJobType: ${scheduleJobType} runOnWeekEnds: ${runOnWeekEnds} jobScheduleTimeMins: ${jobScheduleTimeMins} jobScheduleTimeSecs: ${jobScheduleTimeSecs} `)
             let scheduleParam = ''
             let msgForLogger = ''
-            if (triggerType.toLowerCase() === 'seconds') {
-                scheduleParam = `*/${cronTriggerTimeSecs} * * * * *`
-                msgForLogger = `${cronTriggerTimeSecs} Secs`
+            if (scheduleJobType.toLowerCase() === 'seconds') {
+                scheduleParam = `*/${jobScheduleTimeSecs} * * * * *`
+                msgForLogger = `${jobScheduleTimeSecs} Secs`
             } else {
-                scheduleParam = `*/${cronTriggerTimeMins} * * * *`
-                msgForLogger = `${cronTriggerTimeMins} Mins`
+                scheduleParam = `*/${jobScheduleTimeMins} * * * *`
+                msgForLogger = `${jobScheduleTimeMins} Mins`
             }
             logger.debug(`scheduleParam: ${scheduleParam}`)
             if ( runOnWeekEnds.toLowerCase() === 'no') {

@@ -4,7 +4,7 @@ const awsParamEnv = require('aws-param-env');
 const loggerUtils = require('../common/logger-utils');
 const environment = process.env.environment || 'dev';
 const parameterStore = process.env.PATH_PERAMETER_STORE;
-const EventName = 'AWSPARAMETERSTORE'
+const EventName = 'AWS_Parameter_Store'
 const configPath = parameterStore + environment + '/dlqworker/config/'
 
 /*

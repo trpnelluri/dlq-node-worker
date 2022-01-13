@@ -7,7 +7,7 @@ const ParameterStoreData = require('./sharedLib/aws/parameter-store-service');
 ParameterStoreData.loadEnvVariablesFromAWSParamStore();
 const scheduleCronJob = require('./services/schedule-job-HIH-dlq')
 const loggerUtils = require('./sharedLib/common/logger-utils');
-const EventName = 'DLQWORKER';
+const EventName = 'DLQ_Worker_Main';
 let logParams = {};
 const logger = loggerUtils.customLogger( EventName, logParams);
 const app = express();
