@@ -40,6 +40,7 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
             if ( nbReplay > msgMaxRetries ) {
                 targetQueueQRL = targetDLQQRL
                 nbReplay = 0
+                //Need To send an email notification to operations team
             }
             logger.debug(`targetQueueQRL: ${targetQueueQRL}`)
             const sendMsgParams = {
