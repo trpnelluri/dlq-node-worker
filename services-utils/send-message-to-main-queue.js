@@ -2,6 +2,7 @@
 
 const AWS = require('aws-sdk')
 const loggerUtils = require('../sharedLib/common/logger-utils');
+const maxRetryErrNotification = require('../services-utils/send-max-retry-err-notification')
 const IdServiceShared = require('../sharedLib/common/id-service')
 
 AWS.config.update({ region: 'us-east-1' })
@@ -40,6 +41,7 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
             if ( nbReplay > msgMaxRetries ) {
                 targetQueueQRL = targetDLQQRL
                 nbReplay = 0
+                maxRetryErrNotification.sendMaxRetryErrNotifcation(message)
                 //Need To send an email notification to operations team
             }
             logger.debug(`targetQueueQRL: ${targetQueueQRL}`)
