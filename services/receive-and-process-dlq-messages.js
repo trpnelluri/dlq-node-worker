@@ -10,6 +10,7 @@ const sendMsgToMainQueue = require('../services-utils/send-message-to-main-queue
 const sourceQueueURL = process.env.dlq_hih_notifications_queue
 const hihNotifyReprocessTimeInMins = process.env.hihnotificationreprocesstime
 const maxNumberOfMessages = process.env.messagesbatchsize
+const msgMaxRetries = process.env.hihnotificationmaxretries
 const EventName = 'Receive_Message'
 const logger = loggerUtils.customLogger( EventName, {});
 
@@ -36,11 +37,16 @@ async function receiveMsgFromDLQ () {
                 for (let i = 0; i < Messages.length; i++) {
                     logger.info(`receiveMsgFromDLQ message: ${JSON.stringify(Messages[i])}`)
                     let msgReceviedTime = Messages[i].Attributes.ApproximateFirstReceiveTimestamp
+                    let nbReplay = 0
+                    if ( Messages[i].MessageAttributes !== undefined ) {
+                        nbReplay = parseInt(Messages[i].MessageAttributes['sqs-dlq-replay-nb']['StringValue'])
+                    }
+                    // TBD need to implement the email notification process based on this condition
                     let currentTime = await dateTimeUtils.currentTimeInMilliSecs(logger)
                     const msgReceivedTimeDiff = await dateTimeUtils.timeDiffInMins(logger, currentTime, msgReceviedTime)
-                    logger.info(`receiveMsgFromDLQ msgReceviedTime: ${msgReceviedTime} currentTime: ${currentTime} msgReceivedTimeDiff: ${msgReceivedTimeDiff} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins}`);
+                    logger.info(`receiveMsgFromDLQ msgReceviedTime: ${msgReceviedTime} currentTime: ${currentTime} msgReceivedTimeDiff: ${msgReceivedTimeDiff} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} nbReplay ${nbReplay}`);
                     if ( msgReceivedTimeDiff > hihNotifyReprocessTimeInMins ) {
-                        let response = await sendMsgToMainQueue.sendMsgToMainQueue(Messages[i], sourceQueueURL)
+                        let response = await sendMsgToMainQueue.sendMsgToMainQueue(Messages[i], sourceQueueURL, msgMaxRetries)
                         logger.info(`receiveMsgFromDLQ response: ${JSON.stringify(response)}`)
                     } else {
                         logger.info(`receiveMsgFromDLQ ${msgReceivedTimeDiff} is less than ${hihNotifyReprocessTimeInMins}`)

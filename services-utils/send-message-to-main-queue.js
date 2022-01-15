@@ -12,10 +12,9 @@ const logger = loggerUtils.customLogger( EventName, {});
 
 let targetQueueQRL = process.env.main_hih_notifications_queue
 const targetDLQQRL = process.env.dlq_2_hih_notifications_queue
-const msgMaxRetries = process.env.hihnotificationmaxretries
 const msgFirstAttempt = 1
 
-async function sendMsgToMainQueue (message, sourceQueueURL) {
+async function sendMsgToMainQueue (message, sourceQueueURL, msgMaxRetries) {
 
     return new Promise((resolve, reject) => {
 
@@ -41,7 +40,7 @@ async function sendMsgToMainQueue (message, sourceQueueURL) {
             if ( nbReplay > msgMaxRetries ) {
                 targetQueueQRL = targetDLQQRL
                 nbReplay = 0
-                maxRetryErrNotification.sendMaxRetryErrNotifcation(message)
+                maxRetryErrNotification.sendMaxRetryErrNotifcation(msgBody)
                 //Need To send an email notification to operations team
             }
             logger.debug(`targetQueueQRL: ${targetQueueQRL}`)
