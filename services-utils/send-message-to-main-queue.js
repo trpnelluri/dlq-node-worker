@@ -8,15 +8,17 @@ const IdServiceShared = require('../sharedLib/common/id-service')
 AWS.config.update({ region: 'us-east-1' })
 let sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
 const EventName = 'Send_Message'
-const logger = loggerUtils.customLogger( EventName, {});
+
 
 let targetQueueQRL = process.env.main_hih_notifications_queue
 const targetDLQQRL = process.env.dlq_2_hih_notifications_queue
 const msgFirstAttempt = 1
 
-async function sendMsgToMainQueue (message, sourceQueueURL, sendMsgToSecDLQ) {
+async function sendMsgToMainQueue (message, transId, sourceQueueURL, sendMsgToSecDLQ) {
 
     return new Promise((resolve, reject) => {
+        let logParams = {globaltransid: transId}
+        const logger = loggerUtils.customLogger( EventName, logParams);
 
         try {
 
@@ -40,7 +42,7 @@ async function sendMsgToMainQueue (message, sourceQueueURL, sendMsgToSecDLQ) {
             if ( sendMsgToSecDLQ ) {
                 targetQueueQRL = targetDLQQRL
                 nbReplay = 0
-                maxRetryErrNotification.sendMaxRetryErrNotifcation(msgBody) //WIP: Sending Email Notification Ops team.
+                maxRetryErrNotification.sendMaxRetryErrNotifcation(msgBody, transId) //WIP: Sending Email Notification Ops team.
             }
             logger.debug(`targetQueueQRL: ${targetQueueQRL}`)
             const sendMsgParams = {

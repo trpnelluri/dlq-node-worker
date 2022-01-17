@@ -9,15 +9,14 @@ const IdServiceShared = require('../sharedLib/common/id-service')
 const EventName = 'Send_Max_Retry_Notifcation'
 const notification_SQS_url = process.env.notification_queue_url
 
-async function sendMaxRetryErrNotifcation (message) {
+async function sendMaxRetryErrNotifcation (message, transId) {
 
     let msgObj = JSON.parse(message);
-    const guid = msgObj.transaction_id
-    const logParams = {globaltransid: guid};
+    const logParams = {globaltransid: transId};
     const logger = loggerUtils.customLogger( EventName, logParams);
-    try {
 
-        logger.info(`sendMaxRetryErrNotifcation message ${JSON.stringify(msgObj)}`)
+    try {
+        logger.info(`sendMaxRetryErrNotifcation message ${JSON.stringify(msgObj)} transId: ${transId}`)
         /*
         let notificationObj = {
             guid: guid,
@@ -60,7 +59,7 @@ async function sendMaxRetryErrNotifcation (message) {
             }
         })
     } catch (err) {
-        logger.error(`ERROR in timeDiffInMins: ${err.stack}`);
+        logger.error(`ERROR in sendMaxRetryErrNotifcation: ${err.stack}`);
     }
 }
 
