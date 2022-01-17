@@ -40,8 +40,7 @@ async function sendMsgToMainQueue (message, sourceQueueURL, sendMsgToSecDLQ) {
             if ( sendMsgToSecDLQ ) {
                 targetQueueQRL = targetDLQQRL
                 nbReplay = 0
-                maxRetryErrNotification.sendMaxRetryErrNotifcation(msgBody)
-                //Need To send an email notification to operations team
+                maxRetryErrNotification.sendMaxRetryErrNotifcation(msgBody) //WIP: Sending Email Notification Ops team.
             }
             logger.debug(`targetQueueQRL: ${targetQueueQRL}`)
             const sendMsgParams = {
