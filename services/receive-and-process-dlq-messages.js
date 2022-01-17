@@ -15,7 +15,7 @@ const EventName = 'Receive_Message'
 const logger = loggerUtils.customLogger( EventName, {});
 
 
-logger.info(`sourceQueueURL: ${sourceQueueURL} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} maxNumberOfMessages: ${maxNumberOfMessages} `)
+logger.info(`sourceQueueURL: ${sourceQueueURL} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} maxNumberOfMessages: ${maxNumberOfMessages} msgMaxRetries: ${msgMaxRetries}`)
 
 async function receiveMsgFromDLQ () {
 
@@ -37,16 +37,20 @@ async function receiveMsgFromDLQ () {
                 for (let i = 0; i < Messages.length; i++) {
                     logger.info(`receiveMsgFromDLQ message: ${JSON.stringify(Messages[i])}`)
                     let msgReceviedTime = Messages[i].Attributes.ApproximateFirstReceiveTimestamp
-                    let nbReplay = 0
+                    let maxRetries = 0
+                    let sendMsgToSecDLQ = false;
                     if ( Messages[i].MessageAttributes !== undefined ) {
-                        nbReplay = parseInt(Messages[i].MessageAttributes['sqs-dlq-replay-nb']['StringValue'])
+                        maxRetries = parseInt(Messages[i].MessageAttributes['sqs-dlq-replay-nb']['StringValue'])
+                        if ( maxRetries === msgMaxRetries ) {
+                            sendMsgToSecDLQ = true
+                        }
                     }
                     // TBD need to implement the email notification process based on this condition
                     let currentTime = await dateTimeUtils.currentTimeInMilliSecs(logger)
                     const msgReceivedTimeDiff = await dateTimeUtils.timeDiffInMins(logger, currentTime, msgReceviedTime)
-                    logger.info(`receiveMsgFromDLQ msgReceviedTime: ${msgReceviedTime} currentTime: ${currentTime} msgReceivedTimeDiff: ${msgReceivedTimeDiff} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} nbReplay ${nbReplay}`);
-                    if ( msgReceivedTimeDiff > hihNotifyReprocessTimeInMins ) {
-                        let response = await sendMsgToMainQueue.sendMsgToMainQueue(Messages[i], sourceQueueURL, msgMaxRetries)
+                    logger.info(`receiveMsgFromDLQ msgReceviedTime: ${msgReceviedTime} currentTime: ${currentTime} msgReceivedTimeDiff: ${msgReceivedTimeDiff} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} sendMsgToSecDLQ : ${sendMsgToSecDLQ} maxRetries: ${maxRetries}`);
+                    if ( msgReceivedTimeDiff > hihNotifyReprocessTimeInMins || sendMsgToSecDLQ ) {
+                        let response = await sendMsgToMainQueue.sendMsgToMainQueue(Messages[i], sourceQueueURL, sendMsgToSecDLQ)
                         logger.info(`receiveMsgFromDLQ response: ${JSON.stringify(response)}`)
                     } else {
                         logger.info(`receiveMsgFromDLQ ${msgReceivedTimeDiff} is less than ${hihNotifyReprocessTimeInMins}`)

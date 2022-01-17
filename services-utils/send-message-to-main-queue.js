@@ -14,13 +14,13 @@ let targetQueueQRL = process.env.main_hih_notifications_queue
 const targetDLQQRL = process.env.dlq_2_hih_notifications_queue
 const msgFirstAttempt = 1
 
-async function sendMsgToMainQueue (message, sourceQueueURL, msgMaxRetries) {
+async function sendMsgToMainQueue (message, sourceQueueURL, sendMsgToSecDLQ) {
 
     return new Promise((resolve, reject) => {
 
         try {
 
-            logger.info(`sendMsgToMainQueue targetQueueQRL ${targetQueueQRL} targetDLQQRL: ${targetDLQQRL} msgMaxRetries: ${msgMaxRetries} msgFirstAttempt: ${msgFirstAttempt} `)
+            logger.info(`sendMsgToMainQueue targetQueueQRL ${targetQueueQRL} targetDLQQRL: ${targetDLQQRL} sendMsgToSecDLQ: ${sendMsgToSecDLQ} msgFirstAttempt: ${msgFirstAttempt} `)
             let messageId = message.MessageId;
             let receiptHandle = message.ReceiptHandle;
             let messageDeduplicationId = message.Attributes.MessageDeduplicationId
@@ -37,7 +37,7 @@ async function sendMsgToMainQueue (message, sourceQueueURL, msgMaxRetries) {
             messageDeduplicationId = IdServiceShared.getInstance().getId();
             logger.info(`sendMsgToMainQueue nbReplay: ${nbReplay} New messageDeduplicationId: ${messageDeduplicationId}`)
         
-            if ( nbReplay > msgMaxRetries ) {
+            if ( sendMsgToSecDLQ ) {
                 targetQueueQRL = targetDLQQRL
                 nbReplay = 0
                 maxRetryErrNotification.sendMaxRetryErrNotifcation(msgBody)
