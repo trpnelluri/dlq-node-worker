@@ -6,6 +6,11 @@ process.setMaxListeners(0);
 
 const timestampMoment = () => moment().format('YYYY/MM/DD HH:mm:ss SSS');
 const workerName = 'process-dlq-node-worker'
+const env = process.env.environment
+const request = '-'
+const referrer = '-'
+const statusCode = '-'
+const globaltransid = '-'
 
 const customLogger = (eventName, logParams) =>{
     //console.log('in logger utils', logFileName)
@@ -16,7 +21,8 @@ const customLogger = (eventName, logParams) =>{
             new winston.transports.Console({
                 format: winston.format.combine(
                     winston.format.timestamp({ format: timestampMoment }),
-                    winston.format.printf((info) => `${info.timestamp},${info.level.toUpperCase()},${workerName},${logParams.globaltransid || '-' },${eventName},-, ${info.message}`),
+                    winston.format.printf((info) => `${info.timestamp},${info.level.toUpperCase()},${logParams.request || request },${logParams.referrer || referrer },_ 
+                    ${logParams.statusCode || statusCode },${workerName},${env},${logParams.globaltransid || globaltransid },${eventName},-, ${info.message}`),
                 ),
             }),
         ],

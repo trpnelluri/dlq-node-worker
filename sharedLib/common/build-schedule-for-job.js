@@ -1,10 +1,10 @@
 'use strict'
 
-const scheduleJobType = process.env.schedulejobrunin //seconds or minutes
-const runOnWeekEnds = process.env.scheduletorunonweekends //yes or no^days to run
-const jobScheduleTimeMins = process.env.schedulejobinmins // time in mins the Job should trigger
-const jobScheduleTimeSecs = process.env.schedulejobinsecs // time in secs the Job should trigger
-const scheduleNightly = process.env.schedulenightly //yes or no^hours to run
+const scheduleJobType = process.env.schedulejobrunin || 'seconds'//seconds or minutes
+const runOnWeekEnds = process.env.scheduletorunonweekends || 'no^1-5'//yes or no^days to run
+const jobScheduleTimeMins = process.env.schedulejobinmins || '1'// time in mins the Job should trigger
+const jobScheduleTimeSecs = process.env.schedulejobinsecs || '30'// time in secs the Job should trigger
+const scheduleNightly = process.env.schedulenightly || 'no^6-19'//yes or no^hours to run
 /*
 NOTE: scheduleJob Propety is '* * * * * *'
 Explanation: 
@@ -35,18 +35,13 @@ async function populateScheduleJobTriggerParam ( logger ){
                 let paramScheNightly = arrScheNightly[0].toLowerCase()
                 let hoursToRun = arrScheNightly[1]
                 if ( paramScheNightly === 'no') {
-                    if ( hoursToRun === undefined || hoursToRun === null ) {
-                        scheduleHours = '6-19'
-                    } else {
-                        scheduleHours = hoursToRun
-                    }
+                    scheduleHours = hoursToRun
                     msgForLogger = 'Task disabled nightly and is running every'
 
                 } else {
                     msgForLogger = 'Task is running every'
                 }
             }
-
             //Check to schedule the job in seconds or minitues
             if (scheduleJobType.toLowerCase() === 'seconds') {
                 scheduleParam = `*/${jobScheduleTimeSecs} * ${scheduleHours} * * *`
@@ -61,11 +56,9 @@ async function populateScheduleJobTriggerParam ( logger ){
             if ( runOnWeekEnds !== undefined ) {
                 let arrRunOnWeekEnds = runOnWeekEnds.split('^')
                 let paramRunOnWeekEnds = arrRunOnWeekEnds[0].toLowerCase()
-                let daysToRun = arrRunOnWeekEnds[1]
+                
                 if ( paramRunOnWeekEnds === 'no') {
-                    if ( daysToRun === undefined || daysToRun === null ) {
-                        daysToRun = '1-5'
-                    }
+                    let daysToRun = arrRunOnWeekEnds[1]
                     scheduleParam = scheduleParam.replace(/.$/, daysToRun)
                     msgForLogger = `${msgForLogger} on Weekdays.`
                 }
