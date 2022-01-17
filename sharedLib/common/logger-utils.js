@@ -1,6 +1,5 @@
 'use strict'
 const winston = require('winston');
-//const DailyRotateFile = require('winston-daily-rotate-file');
 const moment = require('moment');
 process.setMaxListeners(0);
 
