@@ -16,9 +16,10 @@ exports.executeDLQCommand = async function(res, logger, sourceQueue, targetQueue
             })
         } else {
             logger.info('Successfullly moved the message from dlq to main queue')
+            let noOfMessagesMoved = stdout.slice(9, 11)
             res.send({
                 status: '200',
-                message: `All messages from dlq to ${targetQueue} moved successfully`
+                message: `${noOfMessagesMoved} messages from dlq to ${targetQueue} moved successfully`
             })
         }
     })

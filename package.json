@@ -33,6 +33,7 @@
     "replay-aws-dlq": "^1.0.1",
     "shelljs": "^0.8.5",
     "sqs-consumer": "^5.5.0",
+    "util": "^0.12.4",
     "uuid": "^8.3.2",
     "winston": "^3.3.3"
   },

@@ -8,12 +8,12 @@ let logParams = {};
 
 const logger = loggerUtils.customLogger( EventName, logParams);
 
-exports.default = (req, res) => {
+exports.default = async(req, res) => {
     logger.info(`default req.headers: ${JSON.stringify(req.headers)}`)
     res.send('Welcome to Unissant');
 };
 
-exports.processAuditDLQ = (req, res) => {
+exports.processAuditDLQ = async(req, res) => {
     logger.info(`processAuditDLQ req.headers: ${JSON.stringify(req.headers)}`)
     let sourceQueue = process.env.dlq_audit_queue
     let targetQueue = process.env.main_audit_queue
@@ -21,7 +21,7 @@ exports.processAuditDLQ = (req, res) => {
     processDLQ.executeDLQCommand(res, logger, sourceQueue, targetQueue)
 };
 
-exports.processEmailDLQ = (req, res) => {
+exports.processEmailDLQ = async(req, res) => {
     logger.info(`processEmailDLQ req.headers: ${JSON.stringify(req.headers)}`)
     let sourceQueue = process.env.dlq_email_queue
     let targetQueue = process.env.main_email_queue
@@ -29,7 +29,7 @@ exports.processEmailDLQ = (req, res) => {
     processDLQ.executeDLQCommand(res, logger, sourceQueue, targetQueue)
 };
 
-exports.processEporStatusDLQ = (req, res) => {
+exports.processEporStatusDLQ = async(req, res) => {
     logger.info(`processEporStatusDLQ req.headers: ${JSON.stringify(req.headers)}`)
     let sourceQueue = process.env.dlq_epor_status_queue
     let targetQueue = process.env.main_epor_status_queue
@@ -37,7 +37,7 @@ exports.processEporStatusDLQ = (req, res) => {
     processDLQ.executeDLQCommand(res, logger, sourceQueue, targetQueue)
 };
 
-exports.processMetadataDLQ = (req, res) => {
+exports.processMetadataDLQ = async(req, res) => {
     logger.info(`processMetadataDLQ req.headers: ${JSON.stringify(req.headers)}`)
     let sourceQueue = process.env.dlq_metadata_processor_queue
     let targetQueue = process.env.main_metadata_processor_queue
@@ -45,7 +45,7 @@ exports.processMetadataDLQ = (req, res) => {
     processDLQ.executeDLQCommand(res, logger, sourceQueue, targetQueue)
 };
 
-exports.processPayloadProcessDLQ = (req, res) => {
+exports.processPayloadProcessDLQ = async(req, res) => {
     logger.info(`processPayloadProcessDLQ req.headers: ${JSON.stringify(req.headers)}`)
     let sourceQueue = process.env.dlq_payload_processor_queue
     let targetQueue = process.env.main_payload_processor_queue
@@ -53,7 +53,7 @@ exports.processPayloadProcessDLQ = (req, res) => {
     processDLQ.executeDLQCommand(res, logger, sourceQueue, targetQueue)
 };
 
-exports.processTransactionDLQ = (req, res) => {
+exports.processTransactionDLQ = async(req, res) => {
     logger.info(`processTransactionDLQ req.headers: ${JSON.stringify(req.headers)}`)
     let sourceQueue = process.env.dlq_transaction_queue
     let targetQueue = process.env.main_transaction_queue
@@ -61,7 +61,7 @@ exports.processTransactionDLQ = (req, res) => {
     processDLQ.executeDLQCommand(res, logger, sourceQueue, targetQueue)
 };
 
-exports.processHIHNotificationsDLQ = (req, res) => {
+exports.processHIHNotificationsDLQ = async(req, res) => {
     logger.info(`processHIHNotificationsDLQ req.headers: ${JSON.stringify(req.headers)}`)
     let sourceQueue = process.env.dlq_2_hih_notifications_queue
     let targetQueue = process.env.main_hih_notifications_queue
