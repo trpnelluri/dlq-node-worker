@@ -21,7 +21,7 @@ exports.executeDLQCommand = async function(res, logger, sourceQueue, targetQueue
             let noOfMessagesMoved = stdout.slice(9, strIndex)
             res.send({
                 status: '200',
-                message: `${noOfMessagesMoved} messages from dlq to ${targetQueue} moved successfully`
+                message: `${noOfMessagesMoved} message(s) from dlq to ${targetQueue} moved successfully`
             })
         }
     })
