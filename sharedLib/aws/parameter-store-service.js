@@ -4,7 +4,7 @@ const awsParamEnv = require('aws-param-env');
 const loggerUtils = require('../common/logger-utils');
 const environment = process.env.environment || 'dev';
 const parameterStore = process.env.PATH_PERAMETER_STORE;
-const EventName = 'AWS_Parameter_Store'
+const EventName = 'AWS_PARAMETER_STORE'
 const configPath = parameterStore + environment + '/dlqworker/config/'
 
 /*
@@ -15,9 +15,9 @@ function loadEnvVariablesFromAWSParamStore() {
         awsParamEnv.load(`${configPath}`, { region: 'us-east-1' });
         let logParams = {};
         const logger = loggerUtils.customLogger( EventName, logParams);
-        logger.info('Env variables loaded successfully from AWS Parameter Store.');
+        logger.info('loadEnvVariablesFromAWSParamStore, Env variables loaded successfully from AWS Parameter Store.');
     } catch (err) {
-        console.error('ERROR loading the env variables from AWS Parameter Store.' + err.stack)
+        console.error('loadEnvVariablesFromAWSParamStore, ERROR loading the env variables: ' + err.stack)
     }
 }
 

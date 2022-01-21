@@ -7,7 +7,7 @@ const IdServiceShared = require('../sharedLib/common/id-service')
 
 AWS.config.update({ region: 'us-east-1' })
 let sqs = new AWS.SQS({ apiVersion: '2012-11-05' })
-const EventName = 'Send_Message'
+const EventName = 'SEND_MESSAGE'
 
 
 let targetQueueQRL = process.env.main_hih_notifications_queue
@@ -22,11 +22,11 @@ async function sendMsgToMainQueue (message, transId, sourceQueueURL, sendMsgToSe
 
         try {
 
-            logger.info(`sendMsgToMainQueue targetQueueQRL ${targetQueueQRL} targetDLQQRL: ${targetDLQQRL} sendMsgToSecDLQ: ${sendMsgToSecDLQ} msgFirstAttempt: ${msgFirstAttempt} `)
+            logger.info(`sendMsgToMainQueue, targetQueueQRL ${targetQueueQRL} targetDLQQRL: ${targetDLQQRL} sendMsgToSecDLQ: ${sendMsgToSecDLQ} msgFirstAttempt: ${msgFirstAttempt} `)
             let messageId = message.MessageId;
             let receiptHandle = message.ReceiptHandle;
             let messageDeduplicationId = message.Attributes.MessageDeduplicationId
-            logger.info(`sendMsgToMainQueue data.messageId: ${messageId} receiptHandle: ${receiptHandle} messageDeduplicationId: ${messageDeduplicationId} `)
+            logger.info(`sendMsgToMainQueue, data.messageId: ${messageId} receiptHandle: ${receiptHandle} messageDeduplicationId: ${messageDeduplicationId} `)
             let nbReplay;
             if ( message.MessageAttributes !== undefined ) {
                 nbReplay = parseInt(message.MessageAttributes['sqs-dlq-replay-nb']['StringValue'])
@@ -37,14 +37,14 @@ async function sendMsgToMainQueue (message, transId, sourceQueueURL, sendMsgToSe
             let messageGroupId = message.Attributes.MessageGroupId;
             let msgBody = message.Body
             messageDeduplicationId = IdServiceShared.getInstance().getId();
-            logger.info(`sendMsgToMainQueue nbReplay: ${nbReplay} New messageDeduplicationId: ${messageDeduplicationId}`)
+            logger.info(`sendMsgToMainQueue, nbReplay: ${nbReplay} New messageDeduplicationId: ${messageDeduplicationId}`)
         
             if ( sendMsgToSecDLQ ) {
                 targetQueueQRL = targetDLQQRL
                 nbReplay = 0
                 maxRetryErrNotification.sendMaxRetryErrNotifcation(msgBody, transId) //WIP: Sending Email Notification Ops team.
             }
-            logger.debug(`targetQueueQRL: ${targetQueueQRL}`)
+            logger.debug(`sendMsgToMainQueue, targetQueueQRL: ${targetQueueQRL}`)
             const sendMsgParams = {
                 MessageBody: msgBody,
                 QueueUrl: targetQueueQRL,
@@ -57,27 +57,27 @@ async function sendMsgToMainQueue (message, transId, sourceQueueURL, sendMsgToSe
                     }
                 }
             }
-            logger.info(`sendMsgToMainQueue sendMsgParams: ${JSON.stringify(sendMsgParams)}`)
+            logger.info(`sendMsgToMainQueue, sendMsgParams: ${JSON.stringify(sendMsgParams)}`)
                             
             sqs.sendMessage(sendMsgParams, function(err, data) {
                 if (err) { // an error occurred
-                    logger.error(`sendMessage Error ${err.stack}`);
+                    logger.error(`sendMsgToMainQueue, sendMessage Error ${err.stack}`);
                 } else {
-                    logger.info(`sendMessage data: ${JSON.stringify(data)}`);
+                    logger.info(`sendMsgToMainQueue, sendMessage data: ${JSON.stringify(data)}`);
                     let deleteMsgParams = {
                         QueueUrl: sourceQueueURL,
                         ReceiptHandle: receiptHandle
                     }
                     sqs.deleteMessage(deleteMsgParams, function(error, data) {
                         if (error) {
-                            logger.error(`Error in deleting Queue message, incase of moving file from dlq to main queue:  ${JSON.stringify(error, null, 2)}`);
+                            logger.error(`sendMsgToMainQueue, Error in deleteMessage incase of moving file from dlq to main queue:  ${JSON.stringify(error, null, 2)}`);
                             let response = {
                                 status: 'failure',
                                 message: 'deleting message from dlq'
                             }
                             reject(response)
                         } else {
-                            logger.info(`deleteMessage deleted message from dlq data: ${JSON.stringify(data)}`);
+                            logger.info(`sendMsgToMainQueue, deleteMessage deleted message from dlq data: ${JSON.stringify(data)}`);
                             let response = {
                                 status: 'success',
                                 message: data
@@ -89,7 +89,7 @@ async function sendMsgToMainQueue (message, transId, sourceQueueURL, sendMsgToSe
                 }
             })
         }catch (err) {
-            logger.error(`ERROR in sendMsgToMainQueue: ${err.stack}`);
+            logger.error(`sendMsgToMainQueue, ERROR: ${err.stack}`);
             reject(err);
         }
     })

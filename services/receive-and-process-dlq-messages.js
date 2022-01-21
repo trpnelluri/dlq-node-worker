@@ -11,11 +11,11 @@ const sourceQueueURL = process.env.dlq_hih_notifications_queue
 const hihNotifyReprocessTimeInMins = process.env.hihnotificationreprocesstime
 const maxNumberOfMessages = process.env.messagesbatchsize
 const msgMaxRetries = process.env.hihnotificationmaxretries
-const EventName = 'Receive_Message'
+const EventName = 'RECEIVE_MESSAGE'
 let logger = loggerUtils.customLogger( EventName, {});
 
 
-logger.info(`sourceQueueURL: ${sourceQueueURL} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} maxNumberOfMessages: ${maxNumberOfMessages} msgMaxRetries: ${msgMaxRetries}`)
+logger.info(`RECEIVE_MESSAGE, sourceQueueURL: ${sourceQueueURL} hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} maxNumberOfMessages: ${maxNumberOfMessages} msgMaxRetries: ${msgMaxRetries}`)
 
 async function receiveMsgFromDLQ () {
 
@@ -27,15 +27,15 @@ async function receiveMsgFromDLQ () {
             QueueUrl: sourceQueueURL //DLQ1
         }
 
-        logger.debug(`receiveMsgFromDLQ params: ${JSON.stringify(params)}`)
+        logger.debug(`receiveMsgFromDLQ, params: ${JSON.stringify(params)}`)
         const { Messages } = await sqs.receiveMessage(params).promise();
 
-        logger.debug(`receiveMsgFromDLQ Messages: ${Messages}`)
+        logger.debug(`receiveMsgFromDLQ, Messages: ${Messages}`)
         if (Messages !== undefined && Messages !== null) {
             if ( Messages.length > 0 ) {
-                logger.debug(`receiveMsgFromDLQ Messages.length: ${Messages.length}`)
+                logger.debug(`receiveMsgFromDLQ, Messages.length: ${Messages.length}`)
                 for (let i = 0; i < Messages.length; i++) {
-                    logger.info(`receiveMsgFromDLQ message: ${JSON.stringify(Messages[i])}`)
+                    logger.info(`receiveMsgFromDLQ, message: ${JSON.stringify(Messages[i])}`)
                     let msgReceviedTime = Messages[i].Attributes.ApproximateFirstReceiveTimestamp
                     let transId = Messages[i].Body.transaction_id
                     let logParams = {globaltransid: transId}
@@ -51,22 +51,22 @@ async function receiveMsgFromDLQ () {
                     // TBD need to implement the email notification process based on this condition
                     let currentTime = await dateTimeUtils.currentTimeInMilliSecs(logger)
                     const msgReceivedTimeDiff = await dateTimeUtils.timeDiffInMins(logger, currentTime, msgReceviedTime)
-                    logger.info(`receiveMsgFromDLQ transId: ${transId} msgReceviedTime: ${msgReceviedTime} currentTime: ${currentTime} msgReceivedTimeDiff: ${msgReceivedTimeDiff}_
+                    logger.info(`receiveMsgFromDLQ, transId: ${transId} msgReceviedTime: ${msgReceviedTime} currentTime: ${currentTime} msgReceivedTimeDiff: ${msgReceivedTimeDiff}_
                      hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins} sendMsgToSecDLQ : ${sendMsgToSecDLQ} maxRetries: ${maxRetries}`);
                     if ( msgReceivedTimeDiff > hihNotifyReprocessTimeInMins || sendMsgToSecDLQ ) {
                         let response = await sendMsgToMainQueue.sendMsgToMainQueue(Messages[i], transId, sourceQueueURL, sendMsgToSecDLQ)
-                        logger.info(`receiveMsgFromDLQ response: ${JSON.stringify(response)}`)
+                        logger.info(`receiveMsgFromDLQ, response: ${JSON.stringify(response)}`)
                     } else {
-                        logger.info(`receiveMsgFromDLQ transId: ${transId} msgReceivedTimeDiff: ${msgReceivedTimeDiff} is less than hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins}`)
+                        logger.info(`receiveMsgFromDLQ, transId: ${transId} msgReceivedTimeDiff: ${msgReceivedTimeDiff} is less than hihNotifyReprocessTimeInMins: ${hihNotifyReprocessTimeInMins}`)
                     }
                 }
             }
         } else {
-            logger.debug('receiveMsgFromDLQ Messages are not available in DLQ to process.')
+            logger.debug('receiveMsgFromDLQ, Messages are not available in DLQ to process.')
         }
 
     }catch(err) {
-        logger.error(`ERROR in receiveMsgFromDLQ: ${err.stack}`);
+        logger.error(`receiveMsgFromDLQ, ERROR: ${err.stack}`);
     }
      
 }

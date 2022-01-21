@@ -5,7 +5,7 @@ const processDLQMessage = require('./receive-and-process-dlq-messages');
 const scheduleJobConfig = require('../sharedLib/common/build-schedule-for-job')
 const loggerUtils = require('../sharedLib/common/logger-utils');
 
-const EventName = 'Scheduler'
+const EventName = 'SCHEDULER'
 const logger = loggerUtils.customLogger( EventName, {});
 
 /*
@@ -14,13 +14,13 @@ schedule provided in the configuration and will process the messages placed in t
 */
 async function scheduleProcessHIHDlq () {
     let scheduleJobConfigData = await scheduleJobConfig.populateScheduleJobTriggerParam(logger)
-    logger.info(`scheduleJobConfigData: ${scheduleJobConfigData}`)
+    logger.info(`scheduleProcessHIHDlq, scheduleJobConfigData: ${scheduleJobConfigData}`)
     let arrScheduleJobConfigData = scheduleJobConfigData.split('^')
     let jobSchedule = arrScheduleJobConfigData[0]
     let msgForLogger = arrScheduleJobConfigData[1]
  
     schedule.scheduleJob(jobSchedule, () =>{
-        logger.debug(`${msgForLogger} ${new Date()} `)
+        logger.debug(`scheduleProcessHIHDlq, msgForLogger: ${msgForLogger} ${new Date()} `)
         processDLQMessage.receiveMsgFromDLQ()
     });
 }

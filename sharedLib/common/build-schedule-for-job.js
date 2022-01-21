@@ -24,7 +24,7 @@ NOTE: The following function is used to build the schedule job based on the valu
 async function populateScheduleJobTriggerParam ( logger ){
     return new Promise((resolve, reject) => {
         try {
-            logger.info(`populateScheduleJobTriggerParam scheduleJobType: ${scheduleJobType} runOnWeekEnds: ${runOnWeekEnds} jobScheduleTimeMins: ${jobScheduleTimeMins} jobScheduleTimeSecs: ${jobScheduleTimeSecs} `)
+            logger.info(`populateScheduleJobTriggerParam, scheduleJobType: ${scheduleJobType} runOnWeekEnds: ${runOnWeekEnds} jobScheduleTimeMins: ${jobScheduleTimeMins} jobScheduleTimeSecs: ${jobScheduleTimeSecs} `)
             let scheduleParam = ''
             let msgForLogger = ''
             let scheduleHours = '*'
@@ -50,7 +50,7 @@ async function populateScheduleJobTriggerParam ( logger ){
                 scheduleParam = `*/${jobScheduleTimeMins} ${scheduleHours} * * *`
                 msgForLogger = `${msgForLogger} ${jobScheduleTimeMins} Mins`
             }
-            logger.debug(`scheduleParam: ${scheduleParam}`)
+            logger.debug(`populateScheduleJobTriggerParam, scheduleParam: ${scheduleParam}`)
 
             //Check to verify run on weekends
             if ( runOnWeekEnds !== undefined ) {
@@ -65,11 +65,11 @@ async function populateScheduleJobTriggerParam ( logger ){
             }
            
             let returnParam = `${scheduleParam}^${msgForLogger}`
-            logger.info(`populateScheduleJobTriggerParam scheduleParam: ${scheduleParam} msgForLogger: ${msgForLogger}`)
+            logger.info(`populateScheduleJobTriggerParam, scheduleParam: ${scheduleParam} msgForLogger: ${msgForLogger}`)
             resolve(returnParam)
     
         } catch(err) {
-            logger.error(`ERROR in populateScheduleJobTriggerParam: ${err.stack}`);
+            logger.error(`populateScheduleJobTriggerParam, ERROR: ${err.stack}`);
             reject(err);
         }
     })
