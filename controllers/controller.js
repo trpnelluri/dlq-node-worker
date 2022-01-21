@@ -3,7 +3,7 @@
 const processDLQ = require('../services-utils/dlq-execute-command')
 const loggerUtils = require('../sharedLib/common/logger-utils');
 
-const EventName = 'DLQWORKERCONTROLLER'
+const EventName = 'Controller'
 let logParams = {};
 
 const logger = loggerUtils.customLogger( EventName, logParams);
