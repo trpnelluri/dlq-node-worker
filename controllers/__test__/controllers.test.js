@@ -1,8 +1,6 @@
 'use strict'
 
 const controller = require('../controller')
-const loggerUtils = require('../../sharedLib/common/logger-utils');
-const processDLQ = require('../../services-utils/dlq-execute-command')
 
 const mockRequest = () => {
     const req = {}
@@ -28,8 +26,6 @@ jest.mock('../../sharedLib/common/logger-utils', () => ({
     }))
 }));
 
-const EventName = 'Controller';
-
 describe("Check method \'default\' ", () => {
     test('should 200 and return Welcome message', async () => {
         let req = mockRequest();
@@ -40,31 +36,4 @@ describe("Check method \'default\' ", () => {
         expect(res.send.mock.calls.length).toBe(1);
         expect(res.send).toHaveBeenCalledWith('Welcome to Unissant');
     });
-  
-});
-
-
-describe("Check method \'processAuditDLQ\' ", () => {
-    test('should 200 and return Welcome message', async () => {
-
-        processDLQ.executeDLQCommand.mockResolvedValue({});
-        // processDLQ.executeDLQCommand.mockImplementation(
-        //     (res, logger, sourceQueue, targetQueue) => {
-        //         queryCallback = callback;
-        //     }
-        // );
-
-        let req = mockRequest();
-        //req.params.id = 1;
-        const res = mockResponse();
-        await controller.processAuditDLQ(req, res);
-        expect(res.send).toHaveBeenCalledTimes(1)
-        expect(res.send.mock.calls.length).toBe(1);
-        expect(loggerUtils.customLogger).toBeCalledTimes(1);
-        expect(loggerUtils.customLogger).toBeCalledWith(
-            EventName,
-            expect.anything()
-        );
-    });
-  
 });
