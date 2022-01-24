@@ -14,5 +14,6 @@ build/
 .vscode
 .build
 .lineCount
+config/
 **/junit.xml
 **/package-lock.json
