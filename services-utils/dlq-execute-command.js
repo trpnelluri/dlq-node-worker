@@ -16,9 +16,16 @@ exports.executeDLQCommand = async function(res, logger, sourceQueue, targetQueue
             })
         } else {
             logger.info('executeDLQCommand, Successfullly moved the message from dlq to main queue')
-            let strIndex = stdout.indexOf('message')
+
+            let noOfMsgIndex = stdout.indexOf('replayed')
+            logger.info(`executeDLQCommand, noOfMsgIndex: ${noOfMsgIndex}`)
+            noOfMsgIndex += 9
+            logger.info(`executeDLQCommand, noOfMsgIndex After update: ${noOfMsgIndex}`)
+            let strIndex = stdout.indexOf('message(s)')
             strIndex = strIndex - 1
-            let noOfMessagesMoved = stdout.slice(9, strIndex)
+            logger.info(`executeDLQCommand, strIndex: ${strIndex}`)
+            let noOfMessagesMoved = stdout.slice(noOfMsgIndex, strIndex)
+            logger.info(`executeDLQCommand, noOfMessagesMoved: ${noOfMessagesMoved}`)
             res.send({
                 status: '200',
                 message: `${noOfMessagesMoved} message(s) from dlq to ${targetQueue} moved successfully`
