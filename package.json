@@ -4,7 +4,8 @@
   "description": "This project is used to process the dlq messages for all workers",
   "main": "app.js",
   "scripts": {
-    "test": "jest --coverage --config ./jest.config.js"
+    "test": "jest --coverage --config ./jest.config.js",
+    "dev": "nodemon app.js dev"
   },
   "author": "Siva Nelluri",
   "license": "ISC",
