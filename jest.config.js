@@ -24,6 +24,7 @@ module.exports = {
         '!sharedLib/aws/*',
         '!controllers/*',
         '!sharedLib/common/logger-utils.js',
+        '!sharedLib/common/get-required-data-from-db.js',
         '!services-utils/*',
         '!services/*',
         '!app.js',

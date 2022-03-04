@@ -18,7 +18,7 @@ const customLogger = (eventName, logParams) =>{
             new winston.transports.Console({
                 format: winston.format.combine(
                     winston.format.timestamp({ format: timestampMoment }),
-                    winston.format.printf((info) => `${info.timestamp},${info.level.toUpperCase()},${workerName},${env},${logParams.globaltransid || globaltransid },${logParams.corelationid || corelationid },${eventName},${info.message}`),
+                    winston.format.printf((info) => `${info.timestamp},${info.level.toUpperCase()},${workerName},${env},${eventName},${logParams.globaltransid || globaltransid },${logParams.corelationid || corelationid },${info.message}`),
                 ),
             }),
         ],

@@ -10,7 +10,7 @@ const sendMsgToMainQueue = require('../services-utils/send-message-to-main-queue
 const sourceQueueURL = process.env.dlq_hih_notifications_queue
 const hihNotifyReprocessTimeInMins = process.env.hihnotificationreprocesstime
 const maxNumberOfMessages = process.env.messagesbatchsize
-const msgMaxRetries = process.env.hihnotificationmaxretries
+const msgMaxRetries = parseInt(process.env.hihnotificationmaxretries)
 const EventName = 'RECEIVE_MESSAGE'
 let logger = loggerUtils.customLogger( EventName, {});
 
@@ -37,14 +37,16 @@ async function receiveMsgFromDLQ () {
                 for (let i = 0; i < Messages.length; i++) {
                     logger.info(`receiveMsgFromDLQ, message: ${JSON.stringify(Messages[i])}`)
                     let msgReceviedTime = Messages[i].Attributes.ApproximateFirstReceiveTimestamp
-                    let transId = Messages[i].Body.transaction_id
+                    let payload = JSON.parse(Messages[i].Body);
+                    let transId = payload.global_unique_id
                     let logParams = {globaltransid: transId}
                     logger = loggerUtils.customLogger( EventName, logParams)
                     let maxRetries = 0
                     let sendMsgToSecDLQ = false;
                     if ( Messages[i].MessageAttributes !== undefined ) {
                         maxRetries = parseInt(Messages[i].MessageAttributes['sqs-dlq-replay-nb']['StringValue'])
-                        if ( maxRetries === msgMaxRetries ) {
+                        logger.info(`receiveMsgFromDLQ, maxRetries: ${maxRetries} msgMaxRetries from config: ${msgMaxRetries}`)
+                        if ( maxRetries >= msgMaxRetries) {
                             sendMsgToSecDLQ = true
                         }
                     }

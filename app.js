@@ -14,7 +14,7 @@ const app = express();
 app.use('/', require('./routes/route'));
 const port = process.env.port || 8090;
 app.listen(port, () => {
-    logger.info(`app.listen, listining on port: ${port}`);
+    logger.info(`app.listen, listining on port: ${port} Release Version: ${process.env.releaseversion}`);
     // The following function invoke the sqs message consumer service when ever the application starts.
     scheduleJobToProcessHIHDlq.scheduleProcessHIHDlq();
     logger.info('app.listen, scheduleProcessHIHDlq Job Started');
